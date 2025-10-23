@@ -50,7 +50,7 @@ logger = logging.getLogger(__name__)
 
 # Create session with increased timeout
 session = AiohttpSession(
-    timeout=60,  # Increased timeout to 60 seconds
+    timeout=60,
 )
 
 # Initialize bot and dispatcher with custom session
@@ -74,9 +74,9 @@ class CommentForm(StatesGroup):
 def get_main_menu():
     """Main menu keyboard"""
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="📝 Send Anonymous Message", callback_data="create_post")],
-        [InlineKeyboardButton(text="📊 My Statistics", callback_data="my_stats")],
-        [InlineKeyboardButton(text="ℹ️ About Bot", callback_data="about")]
+        [InlineKeyboardButton(text="📝 Anonymous Xabar Yuborish", callback_data="create_post")],
+        [InlineKeyboardButton(text="📊 Mening Statistikam", callback_data="my_stats")],
+        [InlineKeyboardButton(text="ℹ️ Bot Haqida", callback_data="about")]
     ])
     return keyboard
 
@@ -84,8 +84,8 @@ def get_main_menu():
 def get_skip_image_keyboard():
     """Skip image keyboard"""
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="⏭ Skip Image", callback_data="skip_image")],
-        [InlineKeyboardButton(text="🚫 Cancel", callback_data="cancel")]
+        [InlineKeyboardButton(text="⏭ O'tkazib Yuborish", callback_data="skip_image")],
+        [InlineKeyboardButton(text="🚫 Bekor Qilish", callback_data="cancel")]
     ])
     return keyboard
 
@@ -93,7 +93,7 @@ def get_skip_image_keyboard():
 def get_cancel_keyboard():
     """Cancel keyboard"""
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="🚫 Cancel", callback_data="cancel")]
+        [InlineKeyboardButton(text="🚫 Bekor Qilish", callback_data="cancel")]
     ])
     return keyboard
 
@@ -102,8 +102,8 @@ def get_moderation_keyboard(post_id: int):
     """Moderation keyboard for posts"""
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
         [
-            InlineKeyboardButton(text="✅ Approve", callback_data=f"approve_{post_id}"),
-            InlineKeyboardButton(text="❌ Reject", callback_data=f"reject_{post_id}")
+            InlineKeyboardButton(text="✅ Tasdiqlash", callback_data=f"approve_{post_id}"),
+            InlineKeyboardButton(text="❌ Rad Etish", callback_data=f"reject_{post_id}")
         ]
     ])
     return keyboard
@@ -112,8 +112,10 @@ def get_moderation_keyboard(post_id: int):
 def get_post_keyboard(post_id: int, bot_username: str):
     """Post keyboard with comments buttons using deep linking"""
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="💬 See Comments", url=f"https://t.me/{bot_username}?start=view_post_{post_id}")],
-        [InlineKeyboardButton(text="✍️ Leave Comment", url=f"https://t.me/{bot_username}?start=comment_post_{post_id}")]
+        [InlineKeyboardButton(text="💬 Sharhlarni Ko'rish",
+                              url=f"https://t.me/{bot_username}?start=view_post_{post_id}")],
+        [InlineKeyboardButton(text="✍️ Sharh Qoldirish",
+                              url=f"https://t.me/{bot_username}?start=comment_post_{post_id}")]
     ])
     return keyboard
 
@@ -121,8 +123,8 @@ def get_post_keyboard(post_id: int, bot_username: str):
 def get_back_to_post_keyboard(post_id: int):
     """Back to post keyboard"""
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="✍️ Leave Comment", callback_data=f"add_comment_{post_id}")],
-        [InlineKeyboardButton(text="🔙 Back to Menu", callback_data="back_to_menu")]
+        [InlineKeyboardButton(text="✍️ Sharh Qoldirish", callback_data=f"add_comment_{post_id}")],
+        [InlineKeyboardButton(text="🔙 Menyuga Qaytish", callback_data="back_to_menu")]
     ])
     return keyboard
 
@@ -130,7 +132,7 @@ def get_back_to_post_keyboard(post_id: int):
 def get_back_to_menu_keyboard():
     """Back to menu keyboard"""
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="🔙 Back to Menu", callback_data="back_to_menu")]
+        [InlineKeyboardButton(text="🔙 Menyuga Qaytish", callback_data="back_to_menu")]
     ])
     return keyboard
 
@@ -172,8 +174,8 @@ async def start_handler(message: Message, state: FSMContext):
             await state.set_state(CommentForm.waiting_for_comment)
             await state.update_data(post_id=post_id)
             await message.answer(
-                f"✍️ <b>Leave a comment on Post #{post_id}</b>\n\n"
-                f"Write your anonymous comment:",
+                f"✍️ <b>Post #{post_id} ga sharh qoldirish</b>\n\n"
+                f"Anonymous sharhingizni yozing:",
                 reply_markup=get_cancel_keyboard(),
                 parse_mode="HTML"
             )
@@ -181,13 +183,14 @@ async def start_handler(message: Message, state: FSMContext):
 
     # Regular start message
     welcome_text = (
-        f"👋 <b>Welcome to Anonymous Messages Bot, {first_name}!</b>\n\n"
-        f"🔒 <b>What is this bot?</b>\n"
-        f"This bot allows you to send anonymous messages that will be published "
-        f"to our channel after moderation. You can also view and comment on other posts anonymously.\n\n"
-        f"📢 <b>To get started:</b>\n"
-        f"You need to join our channel to see messages from other users.\n\n"
-        f"Click the button below to join!"
+        f"👋 <b>Xush Kelibsiz, {first_name}!</b>\n\n"
+        f"🔒 <b>Bu bot nima?</b>\n"
+        f"Bu bot sizga Anonymous xabarlar yuborish imkoniyatini beradi, "
+        f"ular moderatsiyadan o'tgach, kanalimizda nashr etiladi. Shuningdek, "
+        f"boshqa foydalanuvchilarning postlariga Anonymous sharhlar qoldira olasiz.\n\n"
+        f"📢 <b>Boshlash uchun:</b>\n"
+        f"Boshqa foydalanuvchilardan xabarlarni ko'rish uchun kanalga obuna bo'lishingiz kerak.\n\n"
+        f"Quyidagi tugmani bosing!"
     )
 
     # Check if user is already a member
@@ -195,7 +198,7 @@ async def start_handler(message: Message, state: FSMContext):
 
     if is_member:
         await message.answer(
-            welcome_text + "\n\n✅ <b>You're already a member! Use the menu below:</b>",
+            welcome_text + "\n\n✅ <b>Siz allaqachon a'zo! Quyidagi menyudan foydalaning:</b>",
             reply_markup=get_main_menu(),
             parse_mode="HTML"
         )
@@ -206,7 +209,7 @@ async def start_handler(message: Message, state: FSMContext):
                 creates_join_request=True
             )
             keyboard = InlineKeyboardMarkup(inline_keyboard=[
-                [InlineKeyboardButton(text="📢 Join Channel", url=invite_link.invite_link)]
+                [InlineKeyboardButton(text="📢 Kanalga Obuna Bo'lish", url=invite_link.invite_link)]
             ])
             await message.answer(
                 welcome_text,
@@ -216,7 +219,7 @@ async def start_handler(message: Message, state: FSMContext):
         except Exception as e:
             logger.error(f"Error creating invite link: {e}")
             await message.answer(
-                welcome_text + "\n\n❌ <b>Error creating invite link. Please contact admin.</b>",
+                welcome_text + "\n\n❌ <b>Taklifnoma havolasini yaratishda xato. Iltimos, admin bilan bog'laning.</b>",
                 parse_mode="HTML"
             )
 
@@ -229,27 +232,27 @@ async def view_post_from_link(message: Message, post_id: int):
     is_member = await check_channel_membership(user_id)
     if not is_member:
         await message.answer(
-            "❌ You need to join the channel first!",
+            "❌ Avval kanalga obuna bo'lishingiz kerak!",
             parse_mode="HTML"
         )
         return
 
     post = db.get_post(post_id)
     if not post:
-        await message.answer("❌ Post not found!", parse_mode="HTML")
+        await message.answer("❌ Post topilmadi!", parse_mode="HTML")
         return
 
     comments = db.get_comments(post_id)
 
     if not comments:
         await message.answer(
-            f"💬 <b>Comments for Post #{post_id}</b>\n\n"
-            f"No comments yet. Be the first to comment!",
+            f"💬 <b>Post #{post_id} ga Sharhlar</b>\n\n"
+            f"Hali sharh yo'q. Birinchi sharh qoldiring!",
             reply_markup=get_back_to_post_keyboard(post_id),
             parse_mode="HTML"
         )
     else:
-        comments_text = f"💬 <b>Comments for Post #{post_id}</b>\n\n"
+        comments_text = f"💬 <b>Post #{post_id} ga Sharhlar</b>\n\n"
         for idx, comment in enumerate(comments, 1):
             comments_text += f"{idx}. <i>{comment['text']}</i>\n\n"
 
@@ -273,10 +276,10 @@ async def handle_join_request(update: ChatJoinRequest):
         await bot.send_message(
             chat_id=update.from_user.id,
             text=(
-                "✅ <b>Your request has been approved!</b>\n\n"
-                "Welcome to our community! Now you can send anonymous messages "
-                "and see posts from other users.\n\n"
-                "Use the menu below to get started:"
+                "✅ <b>Sizning so'rovingiz tasdiqlandi!</b>\n\n"
+                "Jamoamizga xush kelibsiz! Endi siz Anonymous xabarlar yuborishi va "
+                "boshqa foydalanuvchilarning postlarini ko'rishi mumkin.\n\n"
+                "Boshlash uchun quyidagi menyudan foydalaning:"
             ),
             reply_markup=get_main_menu(),
             parse_mode="HTML"
@@ -295,12 +298,12 @@ async def create_post_handler(callback: CallbackQuery, state: FSMContext):
     # Check membership
     is_member = await check_channel_membership(user_id)
     if not is_member:
-        await callback.answer("❌ You need to join the channel first!", show_alert=True)
+        await callback.answer("❌ Avval kanalga obuna bo'lishingiz kerak!", show_alert=True)
         return
 
     await callback.message.edit_text(
-        "📸 <b>Step 1/2: Send an Image</b>\n\n"
-        "Please send an image for your anonymous post, or click Skip to proceed without an image.",
+        "📸 <b>1-qadam/2: Rasm Yuborish</b>\n\n"
+        "Iltimos, Anonymous postingiz uchun rasm yuboring, yoki rasmsiz davom etish uchun O'tkazib Yuborishni bosing.",
         reply_markup=get_skip_image_keyboard(),
         parse_mode="HTML"
     )
@@ -314,8 +317,8 @@ async def skip_image_handler(callback: CallbackQuery, state: FSMContext):
     """Handle skip image button"""
     await state.update_data(image_file_id=None)
     await callback.message.edit_text(
-        "✍️ <b>Step 2/2: Enter Your Message</b>\n\n"
-        "Please write your anonymous message (required):",
+        "✍️ <b>2-qadam/2: Xabaringizni Kiriting</b>\n\n"
+        "Iltimos, Anonymous xabaringizni yozing (majburiy):",
         reply_markup=get_cancel_keyboard(),
         parse_mode="HTML"
     )
@@ -330,9 +333,9 @@ async def receive_image_handler(message: Message, state: FSMContext):
     await state.update_data(image_file_id=photo.file_id)
 
     await message.answer(
-        "✅ <b>Image received!</b>\n\n"
-        "✍️ <b>Step 2/2: Enter Your Message</b>\n\n"
-        "Please write your anonymous message (required):",
+        "✅ <b>Rasm qabul qilindi!</b>\n\n"
+        "✍️ <b>2-qadam/2: Xabaringizni Kiriting</b>\n\n"
+        "Iltimos, Anonymous xabaringizni yozing (majburiy):",
         reply_markup=get_cancel_keyboard(),
         parse_mode="HTML"
     )
@@ -355,10 +358,10 @@ async def receive_text_handler(message: Message, state: FSMContext):
 
     # Send to moderation group
     moderation_text = (
-        f"📝 <b>New Post for Moderation</b>\n"
+        f"📝 <b>Moderatsiya Uchun Yangi Post</b>\n"
         f"Post ID: #{post_id}\n\n"
-        f"<b>Message:</b>\n{text}\n\n"
-        f"👤 From: User #{user_id}"
+        f"<b>Xabar:</b>\n{text}\n\n"
+        f"👤 Foydalanuvchi: #{user_id}"
     )
 
     try:
@@ -379,15 +382,15 @@ async def receive_text_handler(message: Message, state: FSMContext):
             )
 
         await message.answer(
-            "✅ <b>Your post has been submitted for moderation!</b>\n\n"
-            "We'll review it shortly and publish it to the channel if approved.",
+            "✅ <b>Postingiz moderatsiyaga yuborildi!</b>\n\n"
+            "Biz uni tez orada ko'rib chiqamiz va tasdiqlansa, uni kanalda nashr etamiz.",
             reply_markup=get_main_menu(),
             parse_mode="HTML"
         )
     except Exception as e:
         logger.error(f"Error sending to moderation: {e}")
         await message.answer(
-            "❌ <b>Error submitting post. Please try again later.</b>",
+            "❌ <b>Postni yuborishda xato. Iltimos, keyinroq qayta urinib ko'ring.</b>",
             reply_markup=get_main_menu(),
             parse_mode="HTML"
         )
@@ -403,21 +406,21 @@ async def approve_post_handler(callback: CallbackQuery):
 
     # Check if user is admin
     if moderator_id not in ADMINS_ID:
-        await callback.answer("❌ You don't have permission to approve posts!", show_alert=True)
+        await callback.answer("❌ Sizda postlarni tasdiqlash huquqi yo'q!", show_alert=True)
         return
 
     post = db.get_post(post_id)
     if not post:
-        await callback.answer("❌ Post not found!", show_alert=True)
+        await callback.answer("❌ Post topilmadi!", show_alert=True)
         return
 
     if post['status'] != 'pending':
-        await callback.answer("❌ This post has already been processed!", show_alert=True)
+        await callback.answer("❌ Bu post allaqachon qayta ishlanmagan!", show_alert=True)
         return
 
     # Publish to channel
     try:
-        post_text = f"📢 <b>Anonymous Message</b>\n\n{post['text']}"
+        post_text = f"📢 <b>Anonymous Xabar</b>\n\n{post['text']}"
 
         # Get bot username for deep linking
         bot_info = await bot.get_me()
@@ -446,7 +449,7 @@ async def approve_post_handler(callback: CallbackQuery):
         try:
             await bot.send_message(
                 chat_id=post['user_id'],
-                text="✅ <b>Your post has been approved and published!</b>\n\nCheck it out in the channel!",
+                text="✅ <b>Postingiz tasdiqlandi va nashr etildi!</b>\n\nKanalni tekshiring!",
                 parse_mode="HTML"
             )
         except Exception as e:
@@ -454,15 +457,15 @@ async def approve_post_handler(callback: CallbackQuery):
 
         # Update moderation message
         await callback.message.edit_text(
-            callback.message.text + f"\n\n✅ <b>Approved by {callback.from_user.first_name}</b>",
+            callback.message.text + f"\n\n✅ <b>{callback.from_user.first_name} tomonidan tasdiqlandi</b>",
             parse_mode="HTML"
         )
 
-        await callback.answer("✅ Post approved and published!")
+        await callback.answer("✅ Post tasdiqlandi va nashr etildi!")
 
     except Exception as e:
         logger.error(f"Error publishing post: {e}")
-        await callback.answer("❌ Error publishing post!", show_alert=True)
+        await callback.answer("❌ Postni nashr etishda xato!", show_alert=True)
 
 
 @dp.callback_query(F.data.startswith("reject_"))
@@ -473,16 +476,16 @@ async def reject_post_handler(callback: CallbackQuery):
 
     # Check if user is admin
     if moderator_id not in ADMINS_ID:
-        await callback.answer("❌ You don't have permission to reject posts!", show_alert=True)
+        await callback.answer("❌ Sizda postlarni rad etish huquqi yo'q!", show_alert=True)
         return
 
     post = db.get_post(post_id)
     if not post:
-        await callback.answer("❌ Post not found!", show_alert=True)
+        await callback.answer("❌ Post topilmadi!", show_alert=True)
         return
 
     if post['status'] != 'pending':
-        await callback.answer("❌ This post has already been processed!", show_alert=True)
+        await callback.answer("❌ Bu post allaqachon qayta ishlanmagan!", show_alert=True)
         return
 
     # Update post status
@@ -492,7 +495,7 @@ async def reject_post_handler(callback: CallbackQuery):
     try:
         await bot.send_message(
             chat_id=post['user_id'],
-            text="❌ <b>Your post was not approved.</b>\n\nPlease make sure your content follows our guidelines and try again.",
+            text="❌ <b>Sizning postingiz tasdiqlandi.</b>\n\nIltimos, kontentingiz jamiyat qoidalariga mos ekanligini tekshiring va qayta urinib ko'ring.",
             parse_mode="HTML"
         )
     except Exception as e:
@@ -500,11 +503,11 @@ async def reject_post_handler(callback: CallbackQuery):
 
     # Update moderation message
     await callback.message.edit_text(
-        callback.message.text + f"\n\n❌ <b>Rejected by {callback.from_user.first_name}</b>",
+        callback.message.text + f"\n\n❌ <b>{callback.from_user.first_name} tomonidan rad etildi</b>",
         parse_mode="HTML"
     )
 
-    await callback.answer("❌ Post rejected!")
+    await callback.answer("❌ Post rad etildi!")
 
 
 @dp.callback_query(F.data.startswith("view_comments_"))
@@ -516,25 +519,25 @@ async def view_comments_handler(callback: CallbackQuery):
     # Check membership
     is_member = await check_channel_membership(user_id)
     if not is_member:
-        await callback.answer("❌ You need to join the channel first!", show_alert=True)
+        await callback.answer("❌ Avval kanalga obuna bo'lishingiz kerak!", show_alert=True)
         return
 
     post = db.get_post(post_id)
     if not post:
-        await callback.answer("❌ Post not found!", show_alert=True)
+        await callback.answer("❌ Post topilmadi!", show_alert=True)
         return
 
     comments = db.get_comments(post_id)
 
     if not comments:
         await callback.message.answer(
-            f"💬 <b>Comments for Post #{post_id}</b>\n\n"
-            f"No comments yet. Be the first to comment!",
+            f"💬 <b>Post #{post_id} ga Sharhlar</b>\n\n"
+            f"Hali sharh yo'q. Birinchi sharh qoldiring!",
             reply_markup=get_back_to_post_keyboard(post_id),
             parse_mode="HTML"
         )
     else:
-        comments_text = f"💬 <b>Comments for Post #{post_id}</b>\n\n"
+        comments_text = f"💬 <b>Post #{post_id} ga Sharhlar</b>\n\n"
         for idx, comment in enumerate(comments, 1):
             comments_text += f"{idx}. <i>{comment['text']}</i>\n\n"
 
@@ -556,17 +559,17 @@ async def add_comment_handler(callback: CallbackQuery, state: FSMContext):
     # Check membership
     is_member = await check_channel_membership(user_id)
     if not is_member:
-        await callback.answer("❌ You need to join the channel first!", show_alert=True)
+        await callback.answer("❌ Avval kanalga obuna bo'lishingiz kerak!", show_alert=True)
         return
 
     post = db.get_post(post_id)
     if not post:
-        await callback.answer("❌ Post not found!", show_alert=True)
+        await callback.answer("❌ Post topilmadi!", show_alert=True)
         return
 
     await callback.message.answer(
-        f"✍️ <b>Leave a comment on Post #{post_id}</b>\n\n"
-        f"Write your anonymous comment:",
+        f"✍️ <b>Post #{post_id} ga Sharh Qoldirish</b>\n\n"
+        f"Anonymous sharhingizni yozing:",
         reply_markup=get_cancel_keyboard(),
         parse_mode="HTML"
     )
@@ -591,7 +594,7 @@ async def receive_comment_handler(message: Message, state: FSMContext):
     db.add_comment(post_id, user_id, comment_text)
 
     await message.answer(
-        "✅ <b>Your comment has been posted!</b>",
+        "✅ <b>Sharhingiz yuborildi!</b>",
         reply_markup=get_back_to_post_keyboard(post_id),
         parse_mode="HTML"
     )
@@ -606,12 +609,12 @@ async def my_stats_handler(callback: CallbackQuery):
     stats = db.get_user_stats(user_id)
 
     stats_text = (
-        f"📊 <b>Your Statistics</b>\n\n"
-        f"📝 Posts submitted: {stats['total_posts']}\n"
-        f"✅ Approved posts: {stats['approved_posts']}\n"
-        f"❌ Rejected posts: {stats['rejected_posts']}\n"
-        f"⏳ Pending posts: {stats['pending_posts']}\n"
-        f"💬 Comments: {stats['total_comments']}"
+        f"📊 <b>Sizning Statistikangiz</b>\n\n"
+        f"📝 Yuborilgan postlar: {stats['total_posts']}\n"
+        f"✅ Tasdiqlangan postlar: {stats['approved_posts']}\n"
+        f"❌ Rad etilgan postlar: {stats['rejected_posts']}\n"
+        f"⏳ Kutilayotgan postlar: {stats['pending_posts']}\n"
+        f"💬 Sharhlar: {stats['total_comments']}"
     )
 
     await callback.message.edit_text(
@@ -626,17 +629,17 @@ async def my_stats_handler(callback: CallbackQuery):
 async def about_handler(callback: CallbackQuery):
     """Handle about button"""
     about_text = (
-        "ℹ️ <b>About Anonymous Messages Bot</b>\n\n"
-        "This bot allows you to:\n"
-        "• Send anonymous messages to our channel\n"
-        "• View posts from other users\n"
-        "• Comment anonymously on posts\n"
-        "• All posts are moderated before publishing\n\n"
-        "<b>Rules:</b>\n"
-        "• Be respectful\n"
-        "• No spam or inappropriate content\n"
-        "• Follow community guidelines\n\n"
-        "Enjoy staying anonymous! 🎭"
+        "ℹ️ <b>Anonymous Xabarlar Boti Haqida</b>\n\n"
+        "Bu bot sizga quyidagilarni amalga oshirishga yordam beradi:\n"
+        "• Anonymous xabarlarni kanalimizga yuborish\n"
+        "• Boshqa foydalanuvchilarning postlarini ko'rish\n"
+        "• Postlarga Anonymous sharhlar qoldirish\n"
+        "• Barcha postlar nashr etilishdan oldin moderatsiyadan o'tadi\n\n"
+        "<b>Qoidalar:</b>\n"
+        "• Hurmatli bo'ling\n"
+        "• Spam yoki noo'rin kontent bermang\n"
+        "• Jamiyat qoidalariga amal qiling\n\n"
+        "Anonymous qolib boshqacha qiling! 🎭"
     )
 
     await callback.message.edit_text(
@@ -651,7 +654,7 @@ async def about_handler(callback: CallbackQuery):
 async def back_to_menu_handler(callback: CallbackQuery):
     """Handle back to menu button"""
     await callback.message.edit_text(
-        "🏠 <b>Main Menu</b>\n\nChoose an option:",
+        "🏠 <b>Asosiy Menyu</b>\n\nVariantni tanlang:",
         reply_markup=get_main_menu(),
         parse_mode="HTML"
     )
@@ -663,7 +666,7 @@ async def cancel_handler(callback: CallbackQuery, state: FSMContext):
     """Handle cancel button"""
     await state.clear()
     await callback.message.edit_text(
-        "❌ <b>Operation cancelled.</b>",
+        "❌ <b>Jarayon bekor qilindi.</b>",
         reply_markup=get_main_menu(),
         parse_mode="HTML"
     )
@@ -680,13 +683,13 @@ async def admin_stats_handler(message: Message):
     stats = db.get_global_stats()
 
     stats_text = (
-        f"📊 <b>Bot Statistics</b>\n\n"
-        f"👥 Total users: {stats['total_users']}\n"
-        f"📝 Total posts: {stats['total_posts']}\n"
-        f"✅ Approved: {stats['approved_posts']}\n"
-        f"❌ Rejected: {stats['rejected_posts']}\n"
-        f"⏳ Pending: {stats['pending_posts']}\n"
-        f"💬 Total comments: {stats['total_comments']}"
+        f"📊 <b>Botning Statistikasi</b>\n\n"
+        f"👥 Jami foydalanuvchilar: {stats['total_users']}\n"
+        f"📝 Jami postlar: {stats['total_posts']}\n"
+        f"✅ Tasdiqlangan: {stats['approved_posts']}\n"
+        f"❌ Rad etilgan: {stats['rejected_posts']}\n"
+        f"⏳ Kutilayotgan: {stats['pending_posts']}\n"
+        f"💬 Jami sharhlar: {stats['total_comments']}"
     )
 
     await message.answer(stats_text, parse_mode="HTML")
