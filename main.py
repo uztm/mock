@@ -109,11 +109,11 @@ def get_moderation_keyboard(post_id: int):
     return keyboard
 
 
-def get_post_keyboard(post_id: int):
-    """Post keyboard with comments buttons"""
+def get_post_keyboard(post_id: int, bot_username: str):
+    """Post keyboard with comments buttons using deep linking"""
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="💬 See Comments", callback_data=f"view_comments_{post_id}")],
-        [InlineKeyboardButton(text="✍️ Leave Comment", callback_data=f"add_comment_{post_id}")]
+        [InlineKeyboardButton(text="💬 See Comments", url=f"https://t.me/{bot_username}?start=view_post_{post_id}")],
+        [InlineKeyboardButton(text="✍️ Leave Comment", url=f"https://t.me/{bot_username}?start=comment_post_{post_id}")]
     ])
     return keyboard
 
@@ -147,8 +147,8 @@ async def check_channel_membership(user_id: int) -> bool:
 
 # Handlers
 @dp.message(CommandStart())
-async def start_handler(message: Message):
-    """Handle /start command"""
+async def start_handler(message: Message, state: FSMContext):
+    """Handle /start command with deep linking support"""
     user_id = message.from_user.id
     username = message.from_user.username or "Anonymous"
     first_name = message.from_user.first_name or "User"
@@ -156,6 +156,30 @@ async def start_handler(message: Message):
     # Add user to database
     db.add_user(user_id, username, first_name)
 
+    # Check for deep link parameters
+    args = message.text.split(maxsplit=1)
+
+    if len(args) > 1:
+        # Handle deep link
+        deep_link_param = args[1]
+
+        if deep_link_param.startswith("view_post_"):
+            post_id = int(deep_link_param.split("_")[2])
+            await view_post_from_link(message, post_id)
+            return
+        elif deep_link_param.startswith("comment_post_"):
+            post_id = int(deep_link_param.split("_")[2])
+            await state.set_state(CommentForm.waiting_for_comment)
+            await state.update_data(post_id=post_id)
+            await message.answer(
+                f"✍️ <b>Leave a comment on Post #{post_id}</b>\n\n"
+                f"Write your anonymous comment:",
+                reply_markup=get_cancel_keyboard(),
+                parse_mode="HTML"
+            )
+            return
+
+    # Regular start message
     welcome_text = (
         f"👋 <b>Welcome to Anonymous Messages Bot, {first_name}!</b>\n\n"
         f"🔒 <b>What is this bot?</b>\n"
@@ -195,6 +219,45 @@ async def start_handler(message: Message):
                 welcome_text + "\n\n❌ <b>Error creating invite link. Please contact admin.</b>",
                 parse_mode="HTML"
             )
+
+
+async def view_post_from_link(message: Message, post_id: int):
+    """Handle viewing post from deep link"""
+    user_id = message.from_user.id
+
+    # Check membership
+    is_member = await check_channel_membership(user_id)
+    if not is_member:
+        await message.answer(
+            "❌ You need to join the channel first!",
+            parse_mode="HTML"
+        )
+        return
+
+    post = db.get_post(post_id)
+    if not post:
+        await message.answer("❌ Post not found!", parse_mode="HTML")
+        return
+
+    comments = db.get_comments(post_id)
+
+    if not comments:
+        await message.answer(
+            f"💬 <b>Comments for Post #{post_id}</b>\n\n"
+            f"No comments yet. Be the first to comment!",
+            reply_markup=get_back_to_post_keyboard(post_id),
+            parse_mode="HTML"
+        )
+    else:
+        comments_text = f"💬 <b>Comments for Post #{post_id}</b>\n\n"
+        for idx, comment in enumerate(comments, 1):
+            comments_text += f"{idx}. <i>{comment['text']}</i>\n\n"
+
+        await message.answer(
+            comments_text,
+            reply_markup=get_back_to_post_keyboard(post_id),
+            parse_mode="HTML"
+        )
 
 
 @dp.chat_join_request()
@@ -356,19 +419,23 @@ async def approve_post_handler(callback: CallbackQuery):
     try:
         post_text = f"📢 <b>Anonymous Message</b>\n\n{post['text']}"
 
+        # Get bot username for deep linking
+        bot_info = await bot.get_me()
+        bot_username = bot_info.username
+
         if post['image_file_id']:
             channel_message = await bot.send_photo(
                 chat_id=CHANNEL_ID,
                 photo=post['image_file_id'],
                 caption=post_text,
-                reply_markup=get_post_keyboard(post_id),
+                reply_markup=get_post_keyboard(post_id, bot_username),
                 parse_mode="HTML"
             )
         else:
             channel_message = await bot.send_message(
                 chat_id=CHANNEL_ID,
                 text=post_text,
-                reply_markup=get_post_keyboard(post_id),
+                reply_markup=get_post_keyboard(post_id, bot_username),
                 parse_mode="HTML"
             )
 
