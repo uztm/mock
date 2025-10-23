@@ -361,7 +361,7 @@ async def receive_text_handler(message: Message, state: FSMContext):
         f"📝 <b>Moderatsiya Uchun Yangi Post</b>\n"
         f"Post ID: #{post_id}\n\n"
         f"<b>Xabar:</b>\n{text}\n\n"
-        f"👤 Foydalanuvchi: #{user_id}"
+        # f"👤 Foydalanuvchi: #{user_id}"
     )
 
     try:
