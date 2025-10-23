@@ -382,8 +382,8 @@ async def receive_text_handler(message: Message, state: FSMContext):
             )
 
         await message.answer(
-            "✅ <b>Postingiz moderatsiyaga yuborildi!</b>\n\n"
-            "Biz uni tez orada ko'rib chiqamiz va tasdiqlansa, uni kanalda nashr etamiz.",
+            "✅ <b>Postingiz  tez oradi kanalda paydo bo'ladi!</b>\n\n"
+            ,
             reply_markup=get_main_menu(),
             parse_mode="HTML"
         )
@@ -495,7 +495,7 @@ async def reject_post_handler(callback: CallbackQuery):
     try:
         await bot.send_message(
             chat_id=post['user_id'],
-            text="❌ <b>Sizning postingiz tasdiqlandi.</b>\n\nIltimos, kontentingiz jamiyat qoidalariga mos ekanligini tekshiring va qayta urinib ko'ring.",
+            text="❌ <b>Sizning postingiz maqullanmadi.</b>\n\nIltimos, kontentingiz jamiyat qoidalariga mos ekanligini tekshiring va qayta urinib ko'ring.",
             parse_mode="HTML"
         )
     except Exception as e:
